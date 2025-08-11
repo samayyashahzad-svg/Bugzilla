@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h2>Bugs</h2>
+<ul>
+{% for bug in bugs %}
+    <li>
+        <strong>{{ bug.title }}</strong> — {{ bug.bug_type }} — {{ bug.status }}
+        <br>Project: {{ bug.project.name }}
+        <br>Assigned To: {{ bug.assigned_to.username }}
+
+       {% if bug.image %}
+            <br>
+            <a href="{{ bug.image.url }}" target="_blank">
+                {{ bug.image.name|slice:"11:" }}
+            </a>
+        {% endif %}
+    </li>
+    <br>
+{% endfor %}
+</ul>
+
+</body>
+</html>
