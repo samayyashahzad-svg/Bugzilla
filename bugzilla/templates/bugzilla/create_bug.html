@@ -6,11 +6,11 @@
     <title>Document</title>
 </head>
 <body>
-    <h2>Create Bug</h2>
+    {% if object %} <h2>Edit Bug</h2> {% else %} <h2>Create Bug</h2> {% endif %}
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit">Create Bug</button>
+    <button type="submit">{% if object %} Edit Bug {% else %} Create Bug {% endif %}</button>
 </form>
 
 </body>
