@@ -74,7 +74,7 @@ class ListProjectView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         user = self.request.user
         if user.groups.filter(name='Manager').exists():
-            return Project.objects.filter(manager=user)
+            return Project.objects.all()  #.filter(manager=user)
         elif user.groups.filter(name='Developer').exists():
             return Project.objects.filter(developers=user)
         return Project.objects.none()
