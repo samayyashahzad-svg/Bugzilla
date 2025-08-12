@@ -35,10 +35,15 @@ class CustomLoginView(DjangoLoginView):
             login(request, user)
 
             if user.groups.filter(name='Manager').exists():
+                request.session['group'] = 'Manager'
                 return redirect('list_projects')
+            
             elif user.groups.filter(name='QA').exists():
+                request.session['group'] = 'QA'
                 return redirect('list_bugs')
+            
             elif user.groups.filter(name='Developer').exists():
+                request.session['group'] = 'Developer'
                 return redirect('list_projects')
         else:
             return self.form_invalid(self.get_form())
@@ -82,6 +87,7 @@ class ListProjectView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['username'] = self.request.session.get('name', 'Guest')
+        context['group'] = self.request.session.get('group')
         return context
 
 class DetailProjectView(LoginRequiredMixin, DetailView):
@@ -124,6 +130,7 @@ class ListBugView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['username'] = self.request.session.get('name', 'Guest')
+        context['group'] = self.request.session.get('group')
         return context    
 
 
