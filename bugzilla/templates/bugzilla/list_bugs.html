@@ -10,7 +10,7 @@
 <ul>
 {% for bug in bugs %}
     <li>
-        <strong>{{ bug.title }}</strong> — {{ bug.bug_type }} — {{ bug.status }}
+        <a href="{% url 'bug_detail' bug.id %}">{{ bug.title }}</a> — {{ bug.bug_type }} — {{ bug.status }}
         <br>Project: {{ bug.project.name }}
         <br>Assigned To: {{ bug.assigned_to.username }}
 

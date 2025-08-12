@@ -6,12 +6,13 @@
     <title>Document</title>
 </head>
 <body>
+    <h1>Welcome, {{ username }}</h1>
     <h2>Projects</h2>
 <ul>
     
 {% for project in projects %}
     <li>
-        <strong>{{ project.name }}</strong> — {{ project.description }}
+        <a href="{% url 'project_detail' project.id %}">{{ project.name }} — {{ project.description }}</a>
         <br>Manager: {{ project.manager.username }}
         <br>Developers: {{ project.developers.all|join:", " }}
     </li>

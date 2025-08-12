@@ -1,7 +1,7 @@
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.views import LoginView as DjangoLoginView
-from django.views.generic import CreateView, RedirectView, ListView
+from django.views.generic import CreateView, RedirectView, ListView, DeleteView, DetailView, UpdateView
 from django.urls import reverse_lazy
 from django.shortcuts import redirect
 from .forms import SignUpForm, ProjectForm, BugForm
@@ -25,6 +25,9 @@ class CustomLoginView(DjangoLoginView):
         try:
             user_obj = User.objects.get(email=email)
             user = authenticate(username=user_obj.username, password=password)
+            usern = user_obj.username
+            request.session['name'] = usern
+
         except User.DoesNotExist:
             user = None
 
@@ -32,9 +35,9 @@ class CustomLoginView(DjangoLoginView):
             login(request, user)
 
             if user.groups.filter(name='Manager').exists():
-                return redirect('create_project')
+                return redirect('list_projects')
             elif user.groups.filter(name='QA').exists():
-                return redirect('create_bug')
+                return redirect('list_bugs')
             elif user.groups.filter(name='Developer').exists():
                 return redirect('list_projects')
         else:
@@ -62,11 +65,12 @@ class CreateProjectView(LoginRequiredMixin, PermissionRequiredMixin, CreateView)
         form.instance.developers.set(form.cleaned_data['developers'])
         return response
 
+
 class ListProjectView(LoginRequiredMixin, ListView):
     model = Project
     template_name = 'bugzilla/list_projects.html'
     context_object_name = 'projects'
-
+    
     def get_queryset(self):
         user = self.request.user
         if user.groups.filter(name='Manager').exists():
@@ -74,6 +78,21 @@ class ListProjectView(LoginRequiredMixin, ListView):
         elif user.groups.filter(name='Developer').exists():
             return Project.objects.filter(developers=user)
         return Project.objects.none()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['username'] = self.request.session.get('name', 'Guest')
+        return context
+
+class DetailProjectView(LoginRequiredMixin, DetailView):
+    model = Project
+    template_name = 'bugzilla/project_detail.html'
+    context_object_name = 'project'
+
+class ProjectDeleteView(LoginRequiredMixin,DeleteView):
+    model = Project
+    template_name = 'bugzilla/project_confirm_delete.html'
+    success_url = reverse_lazy('list_projects')
 
 
 class CreateBugView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
@@ -101,4 +120,25 @@ class ListBugView(LoginRequiredMixin, ListView):
             return Bug.objects.filter(assigned_to=user)
         return Bug.objects.none()
         print("Hello world")
-    
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['username'] = self.request.session.get('name', 'Guest')
+        return context    
+
+
+class BugDetailView(LoginRequiredMixin, DetailView):
+    model = Bug
+    template_name = 'bugzilla/bug_detail.html'
+    context_object_name = 'bug'
+
+class BugUpdateView(LoginRequiredMixin,UpdateView):
+    model = Bug
+    fields = ['status']
+    template_name = 'bugzilla/create_bug.html'
+    success_url = reverse_lazy('list_bugs')
+
+class BugDeleteView(LoginRequiredMixin,DeleteView):
+    model = Bug
+    template_name = 'bugzilla/bug_delete.html'
+    success_url = reverse_lazy('list_bugs')
