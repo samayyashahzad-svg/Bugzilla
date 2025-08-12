@@ -119,7 +119,7 @@ class ListBugView(LoginRequiredMixin, ListView):
         elif user.groups.filter(name='Developer').exists():
             return Bug.objects.filter(assigned_to=user)
         return Bug.objects.none()
-        print("Hello world")
+        
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
