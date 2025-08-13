@@ -25,14 +25,15 @@ class CustomLoginView(DjangoLoginView):
         try:
             user_obj = User.objects.get(email=email)
             user = authenticate(username=user_obj.username, password=password)
-            usern = user_obj.username
-            request.session['name'] = usern
+            
 
         except User.DoesNotExist:
             user = None
 
         if user is not None:
             login(request, user)
+            usern = user_obj.username
+            request.session['name'] = usern
 
             if user.groups.filter(name='Manager').exists():
                 request.session['group'] = 'Manager'
